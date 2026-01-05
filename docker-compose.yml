@@ -1,0 +1,21 @@
+services:
+  # Service Backend
+  backend:
+    build: ./backend
+    container_name: eraser-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - u2net_cache:/root/.u2net
+
+  # Service Frontend
+  frontend:
+    build: ./frontend
+    container_name: eraser-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  u2net_cache:
