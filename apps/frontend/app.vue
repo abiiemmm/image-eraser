@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+const config = useRuntimeConfig()
+
 // --- STATE MANAGEMENT ---
 const file = ref<File | null>(null)
 const originalPreview = ref<string | null>(null)
@@ -52,8 +54,8 @@ const removeBackground = async () => {
   formData.append('image', file.value)
 
   try {
-    // Panggil API Backend (Pastikan port 8000 nyala)
-    const response = await fetch('http://localhost:8000/api/remove-bg', {
+    // Panggil API Backend
+    const response = await fetch(`${config.public.apiBase}/api/remove-bg`, {
       method: 'POST',
       body: formData,
     })

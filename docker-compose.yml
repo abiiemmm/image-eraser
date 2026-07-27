@@ -1,7 +1,7 @@
 services:
   # Service Backend
   backend:
-    build: ./backend
+    build: ./apps/backend
     container_name: eraser-backend
     ports:
       - "8000:8000"
@@ -10,10 +10,12 @@ services:
 
   # Service Frontend
   frontend:
-    build: ./frontend
+    build: ./apps/frontend
     container_name: eraser-frontend
     ports:
       - "3000:3000"
+    environment:
+      - NUXT_PUBLIC_API_BASE=http://localhost:8000
     depends_on:
       - backend
 
