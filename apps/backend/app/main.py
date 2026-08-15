@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.routers import api
+from app.services.eraser_service import load_model
 import uvicorn
 
 app = FastAPI(title=settings.PROJECT_NAME)
@@ -18,9 +19,25 @@ app.add_middleware(
 # Register Router
 app.include_router(api.router, prefix="/api")
 
+
+@app.on_event("startup")
+def startup() -> None:
+    load_model()
+
 @app.get("/")
 def read_root():
-    return {"message": "Magic Eraser API is Running (FastAPI) 🚀"}
+    return {"message": "Image Eraser API is running"}
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
+@app.get("/ready")
+def ready():
+    from app.services import eraser_service
+    return {"status": "ready" if eraser_service.session is not None else "loading"}
 
 # Entry point untuk debugging langsung
 if __name__ == "__main__":

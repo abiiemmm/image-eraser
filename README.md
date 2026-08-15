@@ -36,10 +36,14 @@ Terdiri dari 2 aplikasi terpisah di `apps/`:
 
 FastAPI service dengan satu endpoint utama:
 
-- **`POST /api/remove-bg`** — terima file gambar (`multipart/form-data`, field `image`), balikin gambar PNG transparan (background sudah dihapus) sebagai binary response (`image/png`).
-  - Validasi: file harus bertipe `image/*`, kalau tidak return `400`.
-  - Error saat pemrosesan return `500` dengan detail pesan.
+- **`POST /api/remove-bg`** — terima file gambar (`multipart/form-data`, field `image`), balikin gambar PNG transparan sebagai binary response (`image/png`).
+- **`POST /api/remove-bg/batch`** — terima hingga 10 file gambar pada field `images`, balikin ZIP hasil PNG.
+  - Validasi format berdasarkan isi file: JPG, PNG, atau WEBP.
+  - Batas default ukuran file 10 MB dan resolusi 40 juta pixel.
+  - Error internal dicatat di server tanpa membocorkan detail ke client.
 - **`GET /`** — health check sederhana, balikin pesan status API.
+- **`GET /health`** — liveness check container.
+- **`GET /ready`** — mengecek model AI sudah siap digunakan.
 
 Proses penghapusan background (`app/services/eraser_service.py`):
 1. Model AI di-load sekali saat startup: [`rembg`](https://github.com/danielgatis/rembg) dengan model `isnet-general-use` (bagus untuk objek/logo dengan garis tegas).
@@ -57,6 +61,9 @@ Single-page app (satu file `app.vue`) dengan alur:
 3. **Hasil** — response (blob PNG) ditampilkan di panel "Hasil" dengan background checkerboard transparan.
 4. **Download** — tombol "Download HD" untuk unduh hasil sebagai `image-eraser-result.png`.
 5. **Reset** — tombol "Ulangi" untuk mengulang dari awal.
+6. **Output** — hasil dapat diunduh sebagai PNG transparan atau WEBP, dengan pilihan background transparan, putih, atau hitam.
+7. **Editor** — hapus manual area yang tidak diinginkan dengan brush dan undo.
+8. **Batch** — proses hingga 10 gambar dan download sebagai ZIP.
 
 Alamat backend dibaca dari `runtimeConfig.public.apiBase` (env `NUXT_PUBLIC_API_BASE`), bukan hardcode, lihat `nuxt.config.ts`.
 
@@ -107,3 +114,9 @@ UI akan jalan di `http://localhost:3000`.
 - **Backend**: FastAPI, `rembg` (model `isnet-general-use`), Pillow, Uvicorn
 - **Frontend**: Nuxt 4, Vue 3, Tailwind CSS
 - **Deployment**: Docker + Docker Compose
+
+### Riwayat Lokal dan Dependency
+
+Riwayat hasil disimpan hanya di IndexedDB browser, dengan batas maksimal 8 hasil atau 100 MB. Item paling lama akan dihapus otomatis ketika batas tercapai. Gunakan tombol `Hapus semua` untuk mengosongkan riwayat secara manual.
+
+Dependency frontend telah diperbarui ke Nuxt 4.5.2 dan Vue 3.5.41. Jalankan `npm audit` dari `apps/frontend` untuk memverifikasi status keamanan dependency.

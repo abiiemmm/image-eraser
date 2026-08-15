@@ -10,9 +10,12 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'Magic Eraser',
+      title: 'Image Eraser',
       meta: [
-        { name: 'description', content: 'Hapus background gambar gratis, cepat, tanpa login.' }
+        { name: 'description', content: 'Hapus background gambar gratis, cepat, tanpa login.' },
+        { property: 'og:title', content: 'Image Eraser' },
+        { property: 'og:description', content: 'Hapus background gambar dengan AI tanpa login.' },
+        { property: 'og:type', content: 'website' }
       ]
     }
   },

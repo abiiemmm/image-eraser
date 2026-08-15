@@ -7,7 +7,13 @@ model_name = "isnet-general-use"
 # Opsi alternatif jika isnet masih kurang tajam untuk logo: coba ganti jadi "u2net" (model klasik kadang lebih tegas)
 # model_name = "u2net" 
 
-session = new_session(model_name)
+session = None
+
+
+def load_model() -> None:
+    global session
+    if session is None:
+        session = new_session(model_name)
 
 def process_image(file_bytes: bytes) -> bytes:
     """
@@ -18,6 +24,7 @@ def process_image(file_bytes: bytes) -> bytes:
         
         # Untuk objek dengan garis tegas seperti logo, mematikan alpha matting
         # seringkali memberikan hasil yang lebih utuh dan tajam daripada mencoba menghaluskannya.
+        load_model()
         output_data = remove(
             file_bytes, 
             session=session,
